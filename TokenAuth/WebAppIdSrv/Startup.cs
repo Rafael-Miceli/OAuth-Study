@@ -21,8 +21,8 @@ namespace WebAppIdSrv
                 idsrvApp.UseIdentityServer(new IdentityServerOptions
                 {
                     SiteName = "Embedded IdentityServer",
-                    IssuerUri = "Identinty Uri",
-                    //SigningCertificate = LoadCertificate(),
+                    //IssuerUri = "Identinty Uri",
+                    SigningCertificate = LoadCertificate(),
 
                     Factory = InMemoryFactory.Create(
                         users: Users.Get(),
@@ -34,9 +34,10 @@ namespace WebAppIdSrv
 
         X509Certificate2 LoadCertificate()
         {
-            return new X509Certificate2(
-                string.Format(@"{0}\bin\idsrv3test.pfx",
-                AppDomain.CurrentDomain.BaseDirectory), "idsrv3test");
+
+            string file = string.Format(@"{0}\Certs\idsrv3test.pfx", AppDomain.CurrentDomain.BaseDirectory);
+
+            return new X509Certificate2(file, "idsrv3test");
         }
     }
 }

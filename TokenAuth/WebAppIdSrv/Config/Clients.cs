@@ -22,7 +22,7 @@ namespace WebAppIdSrv.Config
 
                     RedirectUris = new List<string>
                     {
-                        ""
+                        "https://localhost:44306/"
                     }
                 }
             };

@@ -116,6 +116,9 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="packages.config" />
+    <Content Include="Certs\DevRoot.cer" />
+    <Content Include="Certs\idsrv3test.cer" />
+    <Content Include="Certs\idsrv3test.pfx" />
     <None Include="Properties\PublishProfiles\golocidsrv - FTP.pubxml" />
     <None Include="Properties\PublishProfiles\golocidsrv - Web Deploy.pubxml" />
     <None Include="Web.Debug.config">

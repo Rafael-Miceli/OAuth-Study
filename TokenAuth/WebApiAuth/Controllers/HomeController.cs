@@ -14,5 +14,13 @@ namespace WebApiAuth.Controllers
 
             return View();
         }
+
+        [Authorize]
+        public ActionResult Forbiddenn()
+        {
+            ViewBag.Title = "Forbiddenn Page";
+
+            return View();
+        }
     }
 }
