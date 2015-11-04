@@ -5,6 +5,10 @@ using Microsoft.Owin;
 using Owin;
 using Microsoft.Owin.Security.OpenIdConnect;
 using WebApiAuth.Models;
+using System.IdentityModel.Tokens;
+//using Thinktecture.IdentityModel.Client;
+using System.Security.Claims;
+using Microsoft.Owin.Security;
 
 [assembly: OwinStartup(typeof(WebApiAuth.Startup))]
 
@@ -15,6 +19,8 @@ namespace WebApiAuth
         public void Configuration(IAppBuilder app)
         {
             //ConfigureAuth(app);
+
+            JwtSecurityTokenHandler.InboundClaimTypeMap = new Dictionary<string, string>();
 
             app.UseCookieAuthentication(new Microsoft.Owin.Security.Cookies.CookieAuthenticationOptions
             {
@@ -27,14 +33,42 @@ namespace WebApiAuth
                 Authority = "https://golocidsrv.azurewebsites.net/identity",
                 RedirectUri = "https://localhost:44306/",
                 SignInAsAuthenticationType = "Cookies",
-                ResponseType = "code id_token",
+                ResponseType = "code id_token token",
                 Scope = "openid profile",
 
                 Notifications = new OpenIdConnectAuthenticationNotifications
                 {
                     MessageReceived = async n =>
                     {
-                        EndpointAndTokenHelper.DecodeAndWrite(n.ProtocolMessage.IdToken);
+                        //EndpointAndTokenHelper.DecodeAndWrite(n.ProtocolMessage.IdToken);
+                        //EndpointAndTokenHelper.DecodeAndWrite(n.ProtocolMessage.AccessToken);
+
+                        //var userInfo = await EndpointAndTokenHelper.CallUserInfoEndpoint(n.ProtocolMessage.AccessToken);
+                    },
+
+                    SecurityTokenValidated = async n =>
+                    {
+                        var userInfo = await EndpointAndTokenHelper.CallUserInfoEndpoint(n.ProtocolMessage.AccessToken);
+
+                        var givenNameClaim = new Claim(
+                            Thinktecture.IdentityModel.Client.JwtClaimTypes.GivenName,
+                            userInfo.Value<string>("given_name"), "");
+
+                        var familyNameClaim = new Claim(
+                            Thinktecture.IdentityModel.Client.JwtClaimTypes.FamilyName,
+                            userInfo.Value<string>("family_name"), "");
+
+                        var newIdentity = new ClaimsIdentity(
+                           n.AuthenticationTicket.Identity.AuthenticationType,
+                           Thinktecture.IdentityModel.Client.JwtClaimTypes.GivenName,
+                           Thinktecture.IdentityModel.Client.JwtClaimTypes.Role);
+
+                        newIdentity.AddClaim(givenNameClaim);
+                        newIdentity.AddClaim(familyNameClaim);
+
+                        n.AuthenticationTicket = new AuthenticationTicket(
+                            newIdentity,
+                            n.AuthenticationTicket.Properties);
                     }
                 }
             });
