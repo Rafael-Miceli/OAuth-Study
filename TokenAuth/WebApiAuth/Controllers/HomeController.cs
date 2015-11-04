@@ -22,5 +22,12 @@ namespace WebApiAuth.Controllers
 
             return View();
         }
+        
+        public ActionResult Logout()
+        {
+            Request.GetOwinContext().Authentication.SignOut();
+
+            return Redirect("/");
+        }
     }
 }

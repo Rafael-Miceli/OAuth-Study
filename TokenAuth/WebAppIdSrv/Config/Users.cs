@@ -16,8 +16,8 @@ namespace WebAppIdSrv.Config
 
                new InMemoryUser
             {
-                Username = "Kevin",
-                Password = "secret",
+                Username = "rafael.miceli",
+                Password = "12345678",
                 Subject = "1",
 
                 Claims = new[]

@@ -28,7 +28,7 @@ namespace WebApiAuth
                 RedirectUri = "https://localhost:44306/",
                 SignInAsAuthenticationType = "Cookies",
                 ResponseType = "code id_token",
-                Scope = "openid",
+                Scope = "openid profile",
 
                 Notifications = new OpenIdConnectAuthenticationNotifications
                 {
