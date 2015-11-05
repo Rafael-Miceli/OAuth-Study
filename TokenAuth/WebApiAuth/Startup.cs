@@ -9,6 +9,7 @@ using System.IdentityModel.Tokens;
 //using Thinktecture.IdentityModel.Client;
 using System.Security.Claims;
 using Microsoft.Owin.Security;
+using System.Web.Helpers;
 
 [assembly: OwinStartup(typeof(WebApiAuth.Startup))]
 
@@ -21,6 +22,7 @@ namespace WebApiAuth
             //ConfigureAuth(app);
 
             JwtSecurityTokenHandler.InboundClaimTypeMap = new Dictionary<string, string>();
+            AntiForgeryConfig.UniqueClaimTypeIdentifier = "unique_user_key";
 
             app.UseCookieAuthentication(new Microsoft.Owin.Security.Cookies.CookieAuthenticationOptions
             {
@@ -65,6 +67,14 @@ namespace WebApiAuth
 
                         newIdentity.AddClaim(givenNameClaim);
                         newIdentity.AddClaim(familyNameClaim);
+
+                        var issuerClaim = n.AuthenticationTicket.Identity
+                            .FindFirst(Thinktecture.IdentityModel.Client.JwtClaimTypes.Issuer);
+                        var subjectClaim = n.AuthenticationTicket.Identity
+                            .FindFirst(Thinktecture.IdentityModel.Client.JwtClaimTypes.Subject);
+
+                        newIdentity.AddClaim(new Claim("unique_user_key",
+                            issuerClaim.Value + "_" + subjectClaim.Value));
 
                         n.AuthenticationTicket = new AuthenticationTicket(
                             newIdentity,
