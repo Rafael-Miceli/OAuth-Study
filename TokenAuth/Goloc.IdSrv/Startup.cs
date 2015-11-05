@@ -32,11 +32,6 @@ namespace Goloc.IdSrv
 
                     SigningCertificate = LoadCertificate(),
                     Factory = factory,
-
-                    //AuthenticationOptions = new AuthenticationOptions
-                    //{
-                    //    IdentityProviders = ConfigureAdditionalIdentityProviders,
-                    //}
                 };
 
                 idsrvApp.UseIdentityServer(options);             
