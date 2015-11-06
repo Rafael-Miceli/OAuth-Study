@@ -18,6 +18,7 @@ namespace Goloc.IdSrv.Config
                     ClientName = "Goloc MVC",
                     ClientId = "goloc-mvc",
                     Flow = Flows.Hybrid,
+                    RequireConsent = false,
 
                     RedirectUris = new List<string>
                     {

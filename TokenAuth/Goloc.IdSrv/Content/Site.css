@@ -1,3 +1,35 @@
-﻿body{
-    background-color:lightpink;
+﻿body {
+    background-color:white;
+}
+
+.panel-default > .panel-heading {
+    background-color: #8CD2E6;
+}
+
+.goloc-logo {
+    max-width: 300px; 
+    height:82px;
+    width: 100%;
+}
+
+.panel-heading {
+    text-align: center
+}
+
+@media (min-width: 768px){
+    .col-md-6 {
+
+    }
+
+    .col-sm-6 {
+        width: 100%
+    }
+}
+
+.col-sm-6 {
+    min-width: 330px
+}
+
+.navbar-inverse {
+    background-color: #8CD2E6;
 }
