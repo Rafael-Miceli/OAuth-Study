@@ -11,13 +11,20 @@ namespace Goloc.IdSrv.Config
         public static IEnumerable<Scope> Get()
         {
             var scopes = new List<Scope>
+            {
+                new Scope
                 {
- 
-                    // identity scopes
-                    StandardScopes.OpenId,
-                    StandardScopes.Profile
+                    Enabled = true,
+                    Name = "UserGroups",
+                    Type = ScopeType.Identity,
+                    Claims = new List<ScopeClaim>
+                    {
+                        new ScopeClaim("role")
+                    }
+                }
+            };
 
-                 };
+            scopes.AddRange(StandardScopes.All);
 
             return scopes;
         }

@@ -12,59 +12,62 @@ namespace Goloc.IdSrv.Config
     {
         public static List<InMemoryUser> Get()
         {
-            return new List<InMemoryUser>() {
-
-               new InMemoryUser
+            return new List<InMemoryUser>()
             {
-                Username = "rafael.miceli",
-                Password = "12345678",
-                Subject = "1",
 
-                Claims = new[]
+                new InMemoryUser
                 {
-                    new Claim(Constants.ClaimTypes.GivenName, "Rafael"),
-                    new Claim(Constants.ClaimTypes.FamilyName, "Miceli"),
-               }
-            }
-            ,
-            new InMemoryUser
-            {
-                Username = "Sven",
-                Password = "secret",
-                Subject = "2",
+                    Username = "rafael.miceli",
+                    Password = "12345678",
+                    Subject = "1",
 
-                Claims = new[]
+                    Claims = new[]
+                    {
+                        new Claim(Constants.ClaimTypes.GivenName, "Rafael"),
+                        new Claim(Constants.ClaimTypes.FamilyName, "Miceli"),
+                        new Claim(Constants.ClaimTypes.Role, "GestorGeral"),
+                        new Claim(Constants.ClaimTypes.Role, "Usuario")
+                   }
+                }
+                ,
+                new InMemoryUser
                 {
-                    new Claim(Constants.ClaimTypes.GivenName, "Sven"),
-                    new Claim(Constants.ClaimTypes.FamilyName, "Vercauteren"),
-               }
-            },
+                    Username = "Sven",
+                    Password = "secret",
+                    Subject = "2",
 
-            new InMemoryUser
-            {
-                Username = "Nils",
-                Password = "secret",
-                Subject = "3",
+                    Claims = new[]
+                    {
+                        new Claim(Constants.ClaimTypes.GivenName, "Sven"),
+                        new Claim(Constants.ClaimTypes.FamilyName, "Vercauteren"),
+                   }
+                },
 
-                Claims = new[]
+                new InMemoryUser
                 {
-                    new Claim(Constants.ClaimTypes.GivenName, "Nils"),
-                    new Claim(Constants.ClaimTypes.FamilyName, "Missorten"),
-               }
-            },
+                    Username = "Nils",
+                    Password = "secret",
+                    Subject = "3",
 
-            new InMemoryUser
-            {
-                Username = "Kenneth",
-                Password = "secret",
-                Subject = "4",
+                    Claims = new[]
+                    {
+                        new Claim(Constants.ClaimTypes.GivenName, "Nils"),
+                        new Claim(Constants.ClaimTypes.FamilyName, "Missorten"),
+                   }
+                },
 
-                Claims = new[]
+                new InMemoryUser
                 {
-                    new Claim(Constants.ClaimTypes.GivenName, "Kenneth"),
-                    new Claim(Constants.ClaimTypes.FamilyName, "Mills"),
-               }
-            }
+                    Username = "Kenneth",
+                    Password = "secret",
+                    Subject = "4",
+
+                    Claims = new[]
+                    {
+                        new Claim(Constants.ClaimTypes.GivenName, "Kenneth"),
+                        new Claim(Constants.ClaimTypes.FamilyName, "Mills"),
+                   }
+                }
 
            };
         }

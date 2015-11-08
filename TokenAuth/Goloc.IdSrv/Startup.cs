@@ -5,6 +5,7 @@ using System.Security.Cryptography.X509Certificates;
 using Goloc.IdSrv.Config;
 using IdentityServer3.Core.Configuration;
 using IdentityServer3.Core.Services.Default;
+using IdentityServer3.Core.Models;
 
 [assembly: OwinStartup(typeof(Goloc.IdSrv.Startup))]
 
@@ -28,19 +29,19 @@ namespace Goloc.IdSrv
 
                 var options = new IdentityServerOptions
                 {
-                    SiteName = "IdentityServer3 - Configuring DefaultViewService",
+                    SiteName = "Goloc",
+
+                    AuthenticationOptions = new AuthenticationOptions
+                    {
+                        EnablePostSignOutAutoRedirect = true
+                    },
 
                     SigningCertificate = LoadCertificate(),
                     Factory = factory,
 
-                    //AuthenticationOptions = new AuthenticationOptions
-                    //{
-                    //    IdentityProviders = ConfigureAdditionalIdentityProviders,
-                    //}
                 };
 
-                idsrvApp.UseIdentityServer(options);             
-                
+                idsrvApp.UseIdentityServer(options);              
             });
         }
 

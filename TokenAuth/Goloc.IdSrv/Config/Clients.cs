@@ -1,4 +1,5 @@
-﻿using IdentityServer3.Core.Models;
+﻿using Goloc.Model.TokenServer;
+using IdentityServer3.Core.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,14 +17,20 @@ namespace Goloc.IdSrv.Config
                 {
                     Enabled = true,
                     ClientName = "Goloc MVC",
-                    ClientId = "goloc-mvc",
-                    Flow = Flows.Hybrid,
+                    ClientId = "golocmvc",
+                    Flow = Flows.Implicit,                    
                     RequireConsent = false,
 
                     RedirectUris = new List<string>
                     {
-                        "https://localhost:44306/"
-                    }
+                        TokenServerConstants.GolocMvcClientUri
+                    },                    
+                    PostLogoutRedirectUris = new List<string>
+                    {
+                        TokenServerConstants.GolocMvcClientUri
+                    },
+
+                    AllowAccessToAllScopes = true
                 }
             };
         }
