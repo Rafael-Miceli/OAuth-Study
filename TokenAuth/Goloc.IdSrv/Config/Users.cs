@@ -54,6 +54,19 @@ namespace Goloc.IdSrv.Config
                         new Claim(Constants.ClaimTypes.GivenName, "Nils"),
                         new Claim(Constants.ClaimTypes.FamilyName, "Missorten"),
                    }
+                },
+
+                new InMemoryUser
+                {
+                    Username = "Kenneth",
+                    Password = "secret",
+                    Subject = "4",
+
+                    Claims = new[]
+                    {
+                        new Claim(Constants.ClaimTypes.GivenName, "Kenneth"),
+                        new Claim(Constants.ClaimTypes.FamilyName, "Mills"),
+                   }
                 }
 
            };

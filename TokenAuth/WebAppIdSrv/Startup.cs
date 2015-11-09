@@ -1,43 +1,120 @@
-﻿using Microsoft.Owin;
+﻿using System.Collections.Generic;
 using Owin;
-using Thinktecture.IdentityServer.Core.Configuration;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-using System.Security.Cryptography.X509Certificates;
-using WebAppIdSrv.Config;
+using Microsoft.Owin.Security.OpenIdConnect;
+using System.IdentityModel.Tokens;
+using System.Security.Claims;
+using Microsoft.Owin.Security;
+using System.Web.Helpers;
+using Microsoft.Owin;
+using Microsoft.Owin.Security.Cookies;
+using IdentityModel;
+using Goloc.Manager.Web.Helpers;
+using Goloc.Model.TokenServer;
+using Goloc.Manager.Web.Authorization;
+using Microsoft.IdentityModel.Protocols;
+using System.Threading.Tasks;
 
-[assembly: OwinStartup(typeof(WebAppIdSrv.Startup))]
+[assembly: OwinStartup(typeof(Goloc.Manager.Web.Startup))]
 
-namespace WebAppIdSrv
+namespace Goloc.Manager.Web
 {
-    public class Startup
+    public partial class Startup
     {
         public void Configuration(IAppBuilder app)
         {
-            app.Map("/identity", idsrvApp =>
+            JwtSecurityTokenHandler.InboundClaimTypeMap = new Dictionary<string, string>();
+            AntiForgeryConfig.UniqueClaimTypeIdentifier = JwtClaimTypes.Subject;
+
+            AntiForgeryConfig.UniqueClaimTypeIdentifier = "unique_user_key";
+
+            app.UseCookieAuthentication(new CookieAuthenticationOptions
             {
-                idsrvApp.UseIdentityServer(new IdentityServerOptions
-                {
-                    SiteName = "Embedded IdentityServer",
-                    //IssuerUri = "Identinty Uri",
-                    SigningCertificate = LoadCertificate(),
-
-                    Factory = InMemoryFactory.Create(
-                        users: Users.Get(),
-                        clients: Clients.Get(),
-                        scopes: Scopes.Get())                    
-                });
+                AuthenticationType = "Cookies"
             });
-        }
 
-        X509Certificate2 LoadCertificate()
-        {
+            app.UseResourceAuthorization(new AuthorizationManager());
 
-            string file = string.Format(@"{0}\Certs\idsrv3test.pfx", AppDomain.CurrentDomain.BaseDirectory);
+            app.UseOpenIdConnectAuthentication(new OpenIdConnectAuthenticationOptions
+            {
+                ClientId = "golocmvc",
+                Authority = TokenServerConstants.IdentityServerAuthority,
+                RedirectUri = TokenServerConstants.GolocMvcClientUri,
+                SignInAsAuthenticationType = "Cookies",
+                ResponseType = "id_token token",
+                //ResponseType = "code id_token token",
+                Scope = "openid profile UserGroups",
 
-            return new X509Certificate2(file, "idsrv3test");
+                Notifications = new OpenIdConnectAuthenticationNotifications
+                {
+                    SecurityTokenValidated = async n =>
+                    {
+                        var userInfo = await EndpointAndTokenHelper.CallUserInfoEndpoint(n.ProtocolMessage.AccessToken);
+
+                        var givenNameClaim = new Claim(
+                            JwtClaimTypes.GivenName,
+                            userInfo.Value<string>(JwtClaimTypes.GivenName), "");
+
+                        var familyNameClaim = new Claim(
+                            JwtClaimTypes.FamilyName,
+                            userInfo.Value<string>(JwtClaimTypes.FamilyName), "");                        
+
+
+                        var newIdentity = new ClaimsIdentity(
+                           n.AuthenticationTicket.Identity.AuthenticationType,
+                           JwtClaimTypes.GivenName,
+                           JwtClaimTypes.Role);
+
+                        var tokens = userInfo.SelectTokens("role");                        
+
+                        foreach (var roleClaims in tokens)
+                        {
+                            foreach (var roleClaim in roleClaims)
+                            {
+                                newIdentity.AddClaim(
+                                    new Claim(
+                                    JwtClaimTypes.Role,
+                                    roleClaim.ToString(), "")
+                                );
+                            }                            
+                        }                        
+                        
+                        newIdentity.AddClaim(givenNameClaim);
+                        newIdentity.AddClaim(familyNameClaim);
+
+                        newIdentity.AddClaim(new Claim("id_token", n.ProtocolMessage.IdToken));
+
+                        var issuerClaim = n.AuthenticationTicket.Identity
+                            .FindFirst(JwtClaimTypes.Issuer);
+                        var subjectClaim = n.AuthenticationTicket.Identity
+                            .FindFirst(JwtClaimTypes.Subject);
+
+                        newIdentity.AddClaim(subjectClaim);
+
+                        newIdentity.AddClaim(new Claim("unique_user_key",
+                            issuerClaim.Value + "_" + subjectClaim.Value));
+
+                        n.AuthenticationTicket = new AuthenticationTicket(
+                            newIdentity,
+                            n.AuthenticationTicket.Properties);
+
+                    },
+
+                    RedirectToIdentityProvider = n =>
+                    {
+                        if (n.ProtocolMessage.RequestType == OpenIdConnectRequestType.LogoutRequest)
+                        {
+                            var idTokenHint = n.OwinContext.Authentication.User.FindFirst("id_token");
+
+                            if (idTokenHint != null)
+                            {
+                                n.ProtocolMessage.IdTokenHint = idTokenHint.Value;
+                            }
+                        }
+
+                        return Task.FromResult(0);
+                    }
+                }
+            });
         }
     }
 }
