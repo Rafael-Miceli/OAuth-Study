@@ -6,6 +6,7 @@ using Goloc.IdSrv.Config;
 using IdentityServer3.Core.Configuration;
 using IdentityServer3.Core.Services.Default;
 using IdentityServer3.Core.Models;
+using IdentityServer3.Core.Services;
 
 [assembly: OwinStartup(typeof(Goloc.IdSrv.Startup))]
 
@@ -18,9 +19,13 @@ namespace Goloc.IdSrv
             app.Map("/identity", idsrvApp =>
             {
                 var factory = new IdentityServerServiceFactory()
-                    .UseInMemoryUsers(Users.Get())
+                    //.UseInMemoryUsers(Users.Get())
                     .UseInMemoryClients(Clients.Get())
                     .UseInMemoryScopes(Scopes.Get());
+
+                var userService = new LocalUserService();
+                factory.UserService = new Registration<IUserService>(resolver => userService);
+                factory.CorsPolicyService = new Registration<ICorsPolicyService>(new DefaultCorsPolicyService { AllowAll = true });
 
                 var viewOptions = new DefaultViewServiceOptions();
                 viewOptions.Stylesheets.Add("/Content/Site.css");
